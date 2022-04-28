@@ -8,5 +8,10 @@
         <f:entry field="description" title="${%Description}">
             <f:textarea/>
         </f:entry>
+        <f:section title="Categories">
+            <f:entry title="Categories">
+                <f:repeatableProperty field="categories"/>
+            </f:entry>
+        </f:section>
     </f:section>
 </j:jelly>
