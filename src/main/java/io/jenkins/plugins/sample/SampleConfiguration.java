@@ -1,5 +1,8 @@
 package io.jenkins.plugins.sample;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.util.FormValidation;
@@ -38,8 +41,11 @@ public class SampleConfiguration extends GlobalConfiguration {
      */
     @DataBoundSetter
     public void setLabel(String label) {
-        this.label = label;
-        save();
+        Pattern p = Pattern.compile("^[ A-Za-z]+$");
+        if (p.matcher(label).matches()) {
+            this.label = label;
+            save();
+        }
     }
 
     public String getDescription() {
@@ -54,7 +60,11 @@ public class SampleConfiguration extends GlobalConfiguration {
 
     public FormValidation doCheckLabel(@QueryParameter String value) {
         if (StringUtils.isEmpty(value)) {
-            return FormValidation.warning("Please specify a label.");
+            return FormValidation.warning("Please specify a name.");
+        }
+        Pattern p = Pattern.compile("^[ A-Za-z]+$");
+        if (!p.matcher(value).matches()){
+            return FormValidation.error("The name must only contain letters and spaces.");
         }
         return FormValidation.ok();
     }
