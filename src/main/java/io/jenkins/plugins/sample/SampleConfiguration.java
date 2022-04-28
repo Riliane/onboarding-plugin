@@ -41,8 +41,7 @@ public class SampleConfiguration extends GlobalConfiguration {
      */
     @DataBoundSetter
     public void setLabel(String label) {
-        Pattern p = Pattern.compile("^[ A-Za-z]+$");
-        if (p.matcher(label).matches()) {
+        if (isLettersSpaces(label)) {
             this.label = label;
             save();
         }
@@ -62,8 +61,7 @@ public class SampleConfiguration extends GlobalConfiguration {
         if (StringUtils.isEmpty(value)) {
             return FormValidation.warning("Please specify a name.");
         }
-        Pattern p = Pattern.compile("^[ A-Za-z]+$");
-        if (!p.matcher(value).matches()){
+        if (!isLettersSpaces(value)){
             return FormValidation.error("The name must only contain letters and spaces.");
         }
         return FormValidation.ok();
@@ -74,6 +72,11 @@ public class SampleConfiguration extends GlobalConfiguration {
             return FormValidation.warning("Please specify a description.");
         }
         return FormValidation.ok();
+    }
+
+    private boolean isLettersSpaces(String label) {
+        Pattern p = Pattern.compile("^[ A-Za-z]+$");
+        return p.matcher(label).matches();
     }
 
 }
