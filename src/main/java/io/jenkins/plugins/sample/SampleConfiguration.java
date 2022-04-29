@@ -31,6 +31,7 @@ public class SampleConfiguration extends GlobalConfiguration {
     private String label;
     private String description;
     private List<Category> categories = Collections.emptyList();
+    private Connection connection;
 
     public SampleConfiguration() {
         // When Jenkins is restarted, load any saved configuration from disk.
@@ -71,6 +72,15 @@ public class SampleConfiguration extends GlobalConfiguration {
     @DataBoundSetter
     public void setCategories(List<Category> categories) {
         this.categories = categories != null ? new ArrayList<Category>(categories) : Collections.<Category>emptyList();
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    @DataBoundSetter
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 
     public FormValidation doCheckLabel(@QueryParameter String value) {

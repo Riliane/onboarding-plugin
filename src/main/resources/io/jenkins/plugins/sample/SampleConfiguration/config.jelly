@@ -13,5 +13,6 @@
                 <f:repeatableProperty field="categories"/>
             </f:entry>
         </f:section>
+        <f:optionalProperty field="connection" title="Use connection"/>
     </f:section>
 </j:jelly>
