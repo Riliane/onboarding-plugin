@@ -85,7 +85,7 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> jobType) {
-            return FreeStyleProject.class.isAssignableFrom(jobType);
+            return true;
         }
 
         public ListBoxModel doFillCategoryUUIDItems(){
