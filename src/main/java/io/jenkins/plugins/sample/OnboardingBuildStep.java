@@ -1,7 +1,9 @@
 package io.jenkins.plugins.sample;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -58,7 +60,7 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
                         @NonNull Launcher launcher, @NonNull TaskListener listener) throws AbortException {
         try{
             listener.getLogger().println("Onboarding step: category " + category.getName());
-            ((DescriptorImpl)getDescriptor()).addLastCategory(new RunWithCategory(run.getExternalizableId(), category));
+            ((DescriptorImpl)getDescriptor()).addLastCategory(run, category);
         } catch (Exception e) {
             setFailed(run, listener, e);
         }
@@ -73,6 +75,7 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
         private List<RunWithCategory> lastRuns;
+        private Map<Category, String> lastRunPerCategory;
 
         public DescriptorImpl() {
             load();
@@ -93,13 +96,18 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
             return true;
         }
 
-        public void addLastCategory(RunWithCategory runWithCategory){
-            if (this.lastRuns == null){
-                this.lastRuns = new LinkedList<>();
+        public void addLastCategory(Run<?, ?> run, Category category){
+            RunWithCategory runWithCategory = new RunWithCategory(run.getExternalizableId(), category);
+            if (lastRuns == null){
+                lastRuns = new LinkedList<>();
             } else if (lastRuns.size() >= 5){
                 lastRuns.remove(0);
             }
             lastRuns.add(runWithCategory);
+            if (lastRunPerCategory == null){
+                lastRunPerCategory = new HashMap<>();
+            }
+            lastRunPerCategory.put(category, run.getParent().getFullName()); //maybe just use the UUID as key? immutable
             save();
         }
 
