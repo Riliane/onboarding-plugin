@@ -111,11 +111,6 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
             save();
         }
 
-        public String getRunUrl(RunWithCategory runWithCategory){
-            Run<?, ?> run = Run.fromExternalizableId(runWithCategory.getRunId());
-            return run == null ? null : run.getAbsoluteUrl();
-        }
-
         public ListBoxModel doFillCategoryUUIDItems(){
             ListBoxModel model = new ListBoxModel();
             List<Category> categories = SampleConfiguration.get().getCategories();
@@ -151,6 +146,11 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
 
         public void setCategory(Category category) {
             this.category = category;
+        }
+
+        public String getRunUrl(){
+            Run<?, ?> run = Run.fromExternalizableId(this.getRunId());
+            return run == null ? null : run.getAbsoluteUrl();
         }
     }
 

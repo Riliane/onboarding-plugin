@@ -5,9 +5,7 @@
         <ol>
         <j:forEach items="${descriptor.lastRuns}" var="run">
             <li>
-                <a href="${descriptor.getRunUrl(descriptor.lastRuns.get(0))}" class="model-link inside">${run
-                .runId}</a> -
-                ${run.category.name}
+                <a href="${run.runUrl}" class="model-link inside">${run.runId}</a> -${run.category.name}
             </li>
         </j:forEach>
         </ol>
