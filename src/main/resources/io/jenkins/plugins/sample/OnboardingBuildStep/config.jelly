@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+    <f:section title="Last Runs">
+        <ol>
+        <j:forEach items="${descriptor.lastRuns}" var="run">
+            <li>
+                <a href="${descriptor.getRunUrl(descriptor.lastRuns.get(0))}" class="model-link inside">${run
+                .runId}</a> -
+                ${run.category.name}
+            </li>
+        </j:forEach>
+        </ol>
+    </f:section>
     <f:entry title="${%Category}">
         <f:select field="categoryUUID" />
     </f:entry>

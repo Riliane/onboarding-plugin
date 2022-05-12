@@ -1,8 +1,8 @@
 package io.jenkins.plugins.sample;
 
+import java.util.LinkedList;
 import java.util.List;
 
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -13,7 +13,6 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
-import hudson.model.FreeStyleProject;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -59,6 +58,7 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
                         @NonNull Launcher launcher, @NonNull TaskListener listener) throws AbortException {
         try{
             listener.getLogger().println("Onboarding step: category " + category.getName());
+            ((DescriptorImpl)getDescriptor()).addLastCategory(new RunWithCategory(run.getExternalizableId(), category));
         } catch (Exception e) {
             setFailed(run, listener, e);
         }
@@ -72,9 +72,14 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
 
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+        private List<RunWithCategory> lastRuns;
 
         public DescriptorImpl() {
             load();
+        }
+
+        public List<RunWithCategory> getLastRuns() {
+            return lastRuns;
         }
 
         @NonNull
@@ -88,6 +93,21 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
             return true;
         }
 
+        public void addLastCategory(RunWithCategory runWithCategory){
+            if (this.lastRuns == null){
+                this.lastRuns = new LinkedList<>();
+            } else if (lastRuns.size() >= 5){
+                lastRuns.remove(0);
+            }
+            lastRuns.add(runWithCategory);
+            save();
+        }
+
+        public String getRunUrl(RunWithCategory runWithCategory){
+            Run<?, ?> run = Run.fromExternalizableId(runWithCategory.getRunId());
+            return run == null ? null : run.getAbsoluteUrl();
+        }
+
         public ListBoxModel doFillCategoryUUIDItems(){
             ListBoxModel model = new ListBoxModel();
             List<Category> categories = SampleConfiguration.get().getCategories();
@@ -97,6 +117,32 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
             }
             return model;
 
+        }
+    }
+
+    public static class RunWithCategory{
+        private String runId;
+        private Category category;
+
+        public RunWithCategory(String runId, Category category) {
+            this.runId = runId;
+            this.category = category;
+        }
+
+        public String getRunId() {
+            return runId;
+        }
+
+        public void setRunId(String runId) {
+            this.runId = runId;
+        }
+
+        public Category getCategory() {
+            return category;
+        }
+
+        public void setCategory(Category category) {
+            this.category = category;
         }
     }
 
