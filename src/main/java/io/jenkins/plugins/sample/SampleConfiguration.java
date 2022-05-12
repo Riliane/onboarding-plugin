@@ -8,8 +8,11 @@ import java.util.regex.Pattern;
 
 import hudson.Extension;
 import hudson.ExtensionList;
+import hudson.model.Job;
 import hudson.util.FormValidation;
 import jenkins.model.GlobalConfiguration;
+import jenkins.model.Jenkins;
+
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -32,6 +35,7 @@ public class SampleConfiguration extends GlobalConfiguration {
     private String description;
     private List<Category> categories = Collections.emptyList();
     private Connection connection;
+    private String lastCategorizedJobId;
 
     public SampleConfiguration() {
         // When Jenkins is restarted, load any saved configuration from disk.
@@ -82,6 +86,22 @@ public class SampleConfiguration extends GlobalConfiguration {
     public void setConnection(Connection connection) {
         this.connection = connection;
     }
+
+    public String getLastCategorizedJobId() {
+        return lastCategorizedJobId;
+    }
+    @DataBoundSetter
+    public void setLastCategorizedJobId(String lastCategorizedJobId) {
+        this.lastCategorizedJobId = lastCategorizedJobId;
+        save(); //do I need this?
+    }
+
+    public String getLastJobDisplayName(){
+        if (lastCategorizedJobId == null) { return null; }
+        Job<?, ?> job = Jenkins.get().getItemByFullName(lastCategorizedJobId, Job.class);
+        return job == null ? null : job.getDisplayName();
+    }
+
 
     public FormValidation doCheckLabel(@QueryParameter String value) {
         if (StringUtils.isEmpty(value)) {

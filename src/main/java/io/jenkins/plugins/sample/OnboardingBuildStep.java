@@ -75,7 +75,7 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
         private List<RunWithCategory> lastRuns;
-        private Map<Category, String> lastRunPerCategory;
+        private Map<Category, String> lastJobPerCategory;
 
         public DescriptorImpl() {
             load();
@@ -104,10 +104,11 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
                 lastRuns.remove(0);
             }
             lastRuns.add(runWithCategory);
-            if (lastRunPerCategory == null){
-                lastRunPerCategory = new HashMap<>();
+            if (lastJobPerCategory == null){
+                lastJobPerCategory = new HashMap<>();
             }
-            lastRunPerCategory.put(category, run.getParent().getFullName()); //maybe just use the UUID as key? immutable
+            lastJobPerCategory.put(category, run.getParent().getFullName()); //maybe just use the UUID as key? immutable
+            SampleConfiguration.get().setLastCategorizedJobId(run.getParent().getFullName());
             save();
         }
 
