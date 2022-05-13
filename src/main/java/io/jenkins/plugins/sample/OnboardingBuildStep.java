@@ -12,6 +12,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
+import hudson.ExtensionList;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
@@ -81,6 +82,11 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
             load();
         }
 
+        /** @return the singleton instance */
+        public static DescriptorImpl get() {
+            return ExtensionList.lookupSingleton(DescriptorImpl.class);
+        }
+
         public List<RunWithCategory> getLastRuns() {
             return lastRuns;
         }
@@ -112,12 +118,25 @@ public class OnboardingBuildStep extends Builder implements SimpleBuildStep {
             save();
         }
 
+        public void updateOnJobRename(String oldFullName, String newFullName){
+            for (Map.Entry<Category, String> entry : lastJobPerCategory.entrySet()){
+                if (entry.getValue().equals(oldFullName)){
+                    lastJobPerCategory.put(entry.getKey(), newFullName);
+                }
+            }
+            for (RunWithCategory runWithCategory : lastRuns){
+                if (runWithCategory.getRunId().startsWith(oldFullName) &&
+                    runWithCategory.getRunId().charAt(oldFullName.length()) == '#'){ // # not allowed in names
+                    runWithCategory.setRunId(newFullName + runWithCategory.getRunId().substring(oldFullName.length()));
+                }
+            }
+        }
+
         public ListBoxModel doFillCategoryUUIDItems(){
             ListBoxModel model = new ListBoxModel();
             List<Category> categories = SampleConfiguration.get().getCategories();
             for (Category value : categories) {
-                model.add(value.getName(), value.getUuid()); //can add UUID as value and then search by UUID
-                // but nothing except name is useful in this case
+                model.add(value.getName(), value.getUuid());
             }
             return model;
 
